@@ -29,10 +29,10 @@ Moves are determined by the LLMs based on the current state of the field, adding
 
 ## Installation
 
-1. **Clone the Repository:**
-
    ```bash
    git clone https://github.com/napoles-uach/LLMSports.git
    cd LLMSports
    pip install streamlit ollama
+   streamlit run app.py
+
 
