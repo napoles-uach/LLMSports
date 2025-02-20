@@ -6,7 +6,7 @@ LLM Sports is a turn-based simulation game where two teams—each controlled by 
 <img src="https://raw.githubusercontent.com/napoles-uach/LLMSports/refs/heads/main/demo.png" alt="Demo Image" width="600" />
 Moves are determined by the LLMs based on the current state of the field, with the aim of scoring a goal, avoiding obstacles and the opponent.
 <p align="center">
-  <img src="https://raw.githubusercontent.com/napoles-uach/LLMSports/refs/heads/main/demo.gif" alt="Demo GIF" width="400" />
+  <img src="https://raw.githubusercontent.com/napoles-uach/LLMSports/refs/heads/main/demo.gif" alt="Demo GIF" width="600" />
 </p>
 
 
