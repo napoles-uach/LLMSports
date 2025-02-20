@@ -33,6 +33,7 @@ Moves are determined by the LLMs based on the current state of the field, with t
    git clone https://github.com/napoles-uach/LLMSports.git
    cd LLMSports
    pip install streamlit ollama
+(install locally models like mistral, llama3.2, Gemma2, etc.)
    streamlit run app.py
 
 
