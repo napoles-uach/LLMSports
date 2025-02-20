@@ -3,6 +3,11 @@
 
 LLM Sports is a turn-based simulation game where two teams—each controlled by a selected language model (LLM)—compete in a soccer-inspired match on a grid-based field. The field features dynamic obstacles and designated goal areas, and teams are represented by customizable emojis. Moves are determined by the LLMs based on the current state of the field, adding a strategic twist at the intersection of sports and artificial intelligence.
 
+<img src="https://raw.githubusercontent.com/napoles-uach/LLMSports/refs/heads/main/demo.png" alt="Demo Image" width="600" />
+<img src="https://raw.githubusercontent.com/napoles-uach/LLMSports/refs/heads/main/demo.gif" alt="Demo GIF" width="300" />
+
+....
+
 ![](https://raw.githubusercontent.com/napoles-uach/LLMSports/refs/heads/main/demo.png)
 ![](https://raw.githubusercontent.com/napoles-uach/LLMSports/refs/heads/main/demo.gif)
 ## Features
