@@ -32,5 +32,7 @@ Moves are determined by the LLMs based on the current state of the field, adding
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/yourusername/llm-sports-llm-match.git
-   cd llm-sports-llm-match
+   git clone https://github.com/napoles-uach/LLMSports.git
+   cd LLMSports
+   pip install streamlit ollama
+
