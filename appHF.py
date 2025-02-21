@@ -332,7 +332,7 @@ emoji_options = [
 
 # List of available LLMs (model IDs on Hugging Face Hub)
 llm_options = [
-    "hf.co/arcee-ai/SuperNova-Medius-GGUF:latest",
+    "mistralai/Mistral-7B-Instruct-v0.3",
     "gemma2:latest",
     "deepseek-r1:latest",
     "mistral:latest",
