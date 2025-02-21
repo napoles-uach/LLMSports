@@ -301,7 +301,7 @@ def run_game(team_a_emoji: str, team_b_emoji: str, team_a_llm: str, team_b_llm: 
         st.markdown("### End of match: Maximum turns reached.")
 
 # Streamlit Interface
-st.title("LLM Sports: LLM Match")
+st.title("LLM Sports 🦙⚽🥅")
 st.write("A turn-based competition between two teams controlled by LLMs (using Hugging Face's hosted Inference API).")
 
 st.markdown("""
