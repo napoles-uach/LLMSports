@@ -118,7 +118,7 @@ def get_team_move(team: str, team_pos: Tuple[int, int], opponent_pos: Tuple[int,
     team_b_pos = team_pos if team == "B" else opponent_pos
 
     prompt = f"""
-You are controlling the agent of Team {team} ({model_name}) in an LLM Sports match.
+You are controlling the agent of Team {team} in an LLM Sports match.
 Here is the current state of the field:
 - Valid moves (without collisions): {valid_moves}
 
@@ -126,8 +126,8 @@ The field looks like this:
 {format_field(rows, cols, obstacles, team_a_pos, team_b_pos, ball, ball_owner, team_a_emoji, team_b_emoji)}
 
 Your goal is to move the ball ⚽ into the opponent's goal area (the white blocks):
-- For Team A: score by moving the ball into the right goal area.
-- For Team B: score by moving the ball into the left goal area.
+- For Team A {team_a_emoji}: score by moving the ball into the right goal area.
+- For Team B {team_b_emoji}: score by moving the ball into the left goal area.
 
 Your possible moves are:
 - 'U' to move up
