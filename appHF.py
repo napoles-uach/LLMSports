@@ -333,7 +333,7 @@ emoji_options = [
 # List of available LLMs (model IDs on Hugging Face Hub)
 llm_options = [
     "mistralai/Mistral-7B-Instruct-v0.3",
-    "gemma2:latest",
+    "google/gemma-2-9b-it",
     "deepseek-r1:latest",
     "mistral:latest",
     "gemma2:9b",
