@@ -4,6 +4,7 @@ import time
 import json
 import re
 import requests
+import os
 from typing import List, Tuple, Set, Optional
 
 # Field parameters
@@ -16,17 +17,19 @@ OBSTACLE = "🧱"
 BALL_EMOJI = "⚽"
 GOAL_EMOJI = "⬜"
 
-# Your Hugging Face API token (store securely, e.g., in st.secrets)
-HF_API_TOKEN = st.secrets.get("hf_api_token", "YOUR_HF_API_TOKEN")
+# Retrieve your Hugging Face API token (set HF_API_TOKEN in your environment or Streamlit secrets)
+HF_API_TOKEN = os.environ.get("HF_API_TOKEN", "YOUR_HF_API_TOKEN_HERE")
 
-def query_model(model_name: str, payload: dict, hf_api_token: str) -> dict:
+def query_model(model_name: str, prompt: str) -> dict:
     """
-    Queries the Hugging Face Inference API for the given model.
-    The payload should include the 'inputs' and any 'parameters' needed.
+    Uses the Hugging Face Inference API to get a text generation response.
     """
     API_URL = f"https://api-inference.huggingface.co/models/{model_name}"
-    headers = {"Authorization": f"Bearer {hf_api_token}"}
+    headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
+    payload = {"inputs": prompt}
     response = requests.post(API_URL, headers=headers, json=payload)
+    if response.status_code != 200:
+        raise Exception(f"Request failed with status {response.status_code}: {response.text}")
     return response.json()
 
 def initialize_obstacles(rows: int, cols: int, num: int, forbidden: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
@@ -51,10 +54,10 @@ def format_field(rows: int, cols: int, obstacles: Set[Tuple[int, int]],
     # Define goals: three centered cells on the left and right edges
     left_goal = {(rows // 2 - 1, 0), (rows // 2, 0), (rows // 2 + 1, 0)}
     right_goal = {(rows // 2 - 1, cols - 1), (rows // 2, cols - 1), (rows // 2 + 1, cols - 1)}
-
+    
     # Initialize the grid with grass
     field = [[GRASS for _ in range(cols)] for _ in range(rows)]
-
+    
     # Draw the goals
     for (r, c) in left_goal:
         field[r][c] = GOAL_EMOJI
@@ -65,17 +68,17 @@ def format_field(rows: int, cols: int, obstacles: Set[Tuple[int, int]],
     for (r, c) in obstacles:
         field[r][c] = OBSTACLE
 
-    # Prepare team representations (adding the ball emoji if possessed)
+    # Prepare the representation for the teams (adding the ball emoji if possessed)
     a_str = team_a_emoji + (BALL_EMOJI if ball_owner == "A" else "")
     b_str = team_b_emoji + (BALL_EMOJI if ball_owner == "B" else "")
-
+    
     # Place the teams on the field (even if they overlap a goal)
     r, c = team_a
     field[r][c] = a_str
     r, c = team_b
     field[r][c] = b_str
 
-    # If the ball is not possessed, draw it on its cell (if cell is free)
+    # If the ball is not possessed, draw it on its cell (if the cell is free)
     if ball_owner is None:
         r, c = ball
         if field[r][c] in [GRASS, OBSTACLE]:
@@ -100,21 +103,22 @@ def get_valid_moves(pos: Tuple[int, int], obstacles: Set[Tuple[int, int]], rows:
     valid_moves.append("S")
     return valid_moves
 
-def get_team_move(team: str, team_pos: Tuple[int, int], opponent_pos: Tuple[int, int],
-                  obstacles: Set[Tuple[int,int]], rows: int, cols: int, ball: Tuple[int,int],
-                  ball_owner: Optional[str], team_llm: str, team_a_emoji: str,
-                  team_b_emoji: str) -> str:
+def get_team_move(team: str, team_pos: Tuple[int, int], opponent_pos: Tuple[int, int], obstacles: Set[Tuple[int,int]],
+                  rows: int, cols: int, ball: Tuple[int,int], ball_owner: Optional[str],
+                  team_llm: str, team_a_emoji: str, team_b_emoji: str) -> str:
     """
-    Requests a move from the selected Hugging Face model (using the Inference API)
-    for the given team, providing context about the current field state.
+    Requests a move from the selected Hugging Face model using the Inference API,
+    providing context about the current field state.
     """
-    # Prepare the prompt
+    model_name = team_llm
+    valid_moves = get_valid_moves(team_pos, obstacles, rows, cols)
+    
+    # Determine positions of both teams for full field display
     team_a_pos = team_pos if team == "A" else opponent_pos
     team_b_pos = team_pos if team == "B" else opponent_pos
-    valid_moves = get_valid_moves(team_pos, obstacles, rows, cols)
 
     prompt = f"""
-You are controlling the agent of Team {team} ({team_llm}) in an LLM Sports match.
+You are controlling the agent of Team {team} ({model_name}) in an LLM Sports match.
 Here is the current state of the field:
 - Valid moves (without collisions): {valid_moves}
 
@@ -144,26 +148,19 @@ Respond in pure JSON format, without any additional text. For example:
     "move": "U"  // or "D", "L", "R", or "S"
 }}
 """
-
-    # Prepare payload for the hosted inference API
-    payload = {"inputs": prompt, "parameters": {"max_new_tokens": 256, "do_sample": True}}
-
     try:
-        response = query_model(team_llm, payload, HF_API_TOKEN)
-        # Expecting a list of dictionaries with a "generated_text" key
-        if isinstance(response, list) and "generated_text" in response[0]:
-            content = response[0]["generated_text"]
-        else:
-            st.write(f"Unexpected response format from model {team_llm}: {response}")
-            return random.choice(valid_moves)
-        st.write(f"🧠 Response from {team_llm} for Team {team}:")
-        st.write(content)
+        # Use the Hugging Face Inference API to generate text
+        result = query_model(model_name, prompt)
+        # The API typically returns a list of outputs; we take the first one.
+        generated_text = result[0]["generated_text"]
+        st.write(f"🧠 Response from {model_name} for Team {team}:")
+        st.write(generated_text)
     except Exception as e:
-        st.write(f"Error calling the Hugging Face API for model {team_llm}: {e}")
+        st.write(f"Error generating text with model {model_name}: {e}")
         return random.choice(valid_moves)
-
+    
     # Extract JSON from the generated text using regex
-    json_match = re.search(r'\{.*\}', content, re.DOTALL)
+    json_match = re.search(r'\{.*\}', generated_text, re.DOTALL)
     if json_match:
         try:
             response_json = json.loads(json_match.group(0))
@@ -177,6 +174,7 @@ Respond in pure JSON format, without any additional text. For example:
     else:
         st.write("No JSON found in the response, choosing a random valid move.")
         move = random.choice(valid_moves)
+    
     return move
 
 def update_position(pos: Tuple[int,int], move: str, obstacles: Set[Tuple[int,int]],
@@ -215,32 +213,35 @@ def run_game(team_a_emoji: str, team_b_emoji: str, team_a_llm: str, team_b_llm: 
       - Team A scores if the ball is moved into the right goal area.
       - Team B scores if the ball is moved into the left goal area.
     """
-    # Initial positions:
+    # Initial positions
     team_a = (3, 1)
     team_b = (3, 5)
     ball = (3, 3)
     ball_owner: Optional[str] = None  # "A", "B", or None
 
-    # Define goal areas (the same cells used for drawing the goals)
+    # Define goal areas (to avoid placing obstacles there)
     left_goal = {(ROWS // 2 - 1, 0), (ROWS // 2, 0), (ROWS // 2 + 1, 0)}
     right_goal = {(ROWS // 2 - 1, COLS - 1), (ROWS // 2, COLS - 1), (ROWS // 2 + 1, COLS - 1)}
 
     forbidden = {team_a, team_b, ball}
     forbidden.update(left_goal)
     forbidden.update(right_goal)
+
     obstacles = initialize_obstacles(ROWS, COLS, NUM_OBSTACLES, forbidden)
 
     max_turns = 20
     turn = 0
+
     field_placeholder = st.empty()
     st.markdown("## Initial State")
     field_placeholder.markdown(format_field(ROWS, COLS, obstacles, team_a, team_b, ball, ball_owner,
                                               team_a_emoji, team_b_emoji))
+
     while turn < max_turns:
         turn += 1
         st.markdown(f"### Turn {turn}")
 
-        # Request moves from each team using their selected Hugging Face model.
+        # Request moves from each team using the selected Hugging Face model via the API.
         move_a = get_team_move("A", team_a, team_b, obstacles, ROWS, COLS, ball, ball_owner,
                                team_a_llm, team_a_emoji, team_b_emoji)
         move_b = get_team_move("B", team_b, team_a, obstacles, ROWS, COLS, ball, ball_owner,
@@ -301,7 +302,7 @@ def run_game(team_a_emoji: str, team_b_emoji: str, team_a_llm: str, team_b_llm: 
 
 # Streamlit Interface
 st.title("LLM Sports: LLM Match")
-st.write("A turn-based competition between two teams controlled by LLMs using Hugging Face's Inference API.")
+st.write("A turn-based competition between two teams controlled by LLMs (using Hugging Face's hosted Inference API).")
 
 st.markdown("""
 **Legend:**
@@ -331,7 +332,7 @@ emoji_options = [
 
 # List of available LLMs (model IDs on Hugging Face Hub)
 llm_options = [
-    "mistralai/Mistral-7B-Instruct-v0.3",
+    "hf.co/arcee-ai/SuperNova-Medius-GGUF:latest",
     "gemma2:latest",
     "deepseek-r1:latest",
     "mistral:latest",
