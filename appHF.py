@@ -29,7 +29,7 @@ def load_model_and_tokenizer(model_name: str):
     return model, tokenizer
 
 # Set your model name (this example uses Qwen/Qwen2.5-72B-Instruct)
-MODEL_NAME = "Qwen/Qwen2.5-72B-Instruct"
+MODEL_NAME ="Tsunami-th/Tsunami-1.0-7B-Instruct" # "Qwen/Qwen2.5-72B-Instruct"
 model, tokenizer = load_model_and_tokenizer(MODEL_NAME)
 
 def initialize_obstacles(rows: int, cols: int, num: int, forbidden: Set[Tuple[int, int]]) -> Set[Tuple[int, int]]:
