@@ -270,7 +270,7 @@ emoji_options = [
 ]
 
 llm_options = [
-    "hf.co/arcee-ai/SuperNova-Medius-GGUF:latest",
+    "Qwen/Qwen2.5-72B-Instruct",
     "gemma2:latest",
     "deepseek-r1:latest",
     "mistral:latest",
