@@ -149,7 +149,7 @@ Respond in pure JSON format, without any additional text. For example:
     "Target Goal": "Right/Left",
     "valid_moves": "{valid_moves}",
     "reasoning": "Explanation of your choice.",
-    "move": "U"  // or "D", "L", "R", or "S"
+    "move": "one of your valid moves
 }}
 """
     try:
