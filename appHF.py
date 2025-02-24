@@ -147,7 +147,7 @@ Respond in pure JSON format, without any additional text. For example:
 {{
     "Team": "your team's emoji",
     "Target Goal": "Right/Left",
-    "valid_moves": "{valid_moves}",
+    "valid_moves": "list of valid moves",
     "reasoning": "Explanation of your choice.",
     "move": "one of your valid moves
 }}
