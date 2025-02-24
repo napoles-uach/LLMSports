@@ -136,7 +136,7 @@ Your possible moves are:
 - 'R' to move right
 - 'S' to stay in place
 
-If {ball_owner} == True, then you own the ball at the moment. False means you don't. 
+If {ball_owner} == {ream}, then you own the ball at the moment. Otherwise you don't. 
 
 You may only make one move per turn, and it must be one of the valid moves: {valid_moves}.
 If you have the ball ⚽ you should avoid your opponent. 
