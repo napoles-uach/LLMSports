@@ -107,13 +107,13 @@ def get_team_move(team: str, team_pos: Tuple[int, int], opponent_pos: Tuple[int,
                   rows: int, cols: int, ball: Tuple[int,int], ball_owner: Optional[str],
                   team_llm: str, team_a_emoji: str, team_b_emoji: str) -> str:
     """
-    Requests a move from the selected Hugging Face model using the Inference API,
-    providing context about the current field state.
+    Solicita un movimiento desde el modelo LLM seleccionado a través de la API de NVIDIA,
+    proporcionando contexto sobre el estado actual del campo.
     """
     model_name = team_llm
     valid_moves = get_valid_moves(team_pos, obstacles, rows, cols)
     
-    # Determine positions of both teams for full field display
+    # Determina las posiciones de ambos equipos para la visualización completa del campo
     team_a_pos = team_pos if team == "A" else opponent_pos
     team_b_pos = team_pos if team == "B" else opponent_pos
 
@@ -136,8 +136,12 @@ Your possible moves are:
 - 'R' to move right
 - 'S' to stay in place
 
-You may only make one move per turn, and it must be one of the valid moves: {valid_moves}.
+If {ball_owner} == True, then you own the ball at the moment. False means you don't. 
 
+You may only make one move per turn, and it must be one of the valid moves: {valid_moves}.
+If you have the ball ⚽ you should avoid your opponent. 
+If your opponent has the ball, then you should go and collide with it to take the ball.
+Remember, your ultimate aim is to move the ball ⚽ into the opponent's goal area (the white blocks)
 Analyze the current state and choose the best move to progress toward your goal.
 Respond in pure JSON format, without any additional text. For example:
 {{
@@ -149,30 +153,24 @@ Respond in pure JSON format, without any additional text. For example:
 }}
 """
     try:
-        # Use the Hugging Face Inference API to generate text
         result = query_model(model_name, prompt)
-        # The API typically returns a list of outputs; we take the first one.
         generated_text = result[0]["generated_text"]
-        st.write(f"🧠 Response from {model_name} for Team {team}:")
-        st.write(generated_text)
+        with st.expander("See model thought"):
+            st.write(f"🧠 Response from {model_name} for Team {team}:")
+            st.write(generated_text)
     except Exception as e:
         st.write(f"Error generating text with model {model_name}: {e}")
         return random.choice(valid_moves)
     
-    # Extract JSON from the generated text using regex
-    json_match = re.search(r'\{.*\}', generated_text, re.DOTALL)
-    if json_match:
-        try:
-            response_json = json.loads(json_match.group(0))
-            move = response_json.get("move", "").upper()
-            if move not in valid_moves:
-                st.write("Invalid move received, choosing a random valid move.")
-                move = random.choice(valid_moves)
-        except json.JSONDecodeError:
-            st.write("Error decoding JSON, choosing a random valid move.")
+    # Extrae el movimiento utilizando re.finditer y obtiene la última coincidencia
+    matches = list(re.finditer(r'"move"\s*:\s*"(U|D|L|R|S)"', generated_text))
+    if matches:
+        move = matches[-1].group(1).upper()
+        if move not in valid_moves:
+            st.write("🚨 Invalid move received, choosing a random valid move.")
             move = random.choice(valid_moves)
     else:
-        st.write("No JSON found in the response, choosing a random valid move.")
+        st.write("🚨🚨 No valid move found in the response, choosing a random valid move.")
         move = random.choice(valid_moves)
     
     return move
