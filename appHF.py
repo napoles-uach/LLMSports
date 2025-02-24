@@ -119,6 +119,7 @@ def get_team_move(team: str, team_pos: Tuple[int, int], opponent_pos: Tuple[int,
 
     prompt = f"""
 You are controlling the agent of Team {team} in an LLM Sports match.
+Currently {ball_owner} owns the ball at the moment. 
 Here is the current state of the field:
 - Valid moves (without collisions): {valid_moves}
 
@@ -136,7 +137,7 @@ Your possible moves are:
 - 'R' to move right
 - 'S' to stay in place
 
-If {ball_owner} == {team}, then you own the ball at the moment. Otherwise you don't. 
+
 
 You may only make one move per turn, and it must be one of the valid moves: {valid_moves}.
 If you have the ball ⚽ you should avoid your opponent. 
