@@ -334,7 +334,7 @@ llm_options = [
     "mistralai/Mistral-7B-Instruct-v0.3",
     "google/gemma-2-9b-it",
     "deepseek-r1:latest",
-    "Qwen/Qwen2.5-14B-Instruct-1M",
+    "Qwen/Qwen2.5-7B-Instruct-1M",
     "gemma2:9b",
     "gemma2:27b",
     "llama3.2:latest",
