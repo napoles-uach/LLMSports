@@ -1,7 +1,7 @@
 # LLM Sports
 
 
-[LLM]("https://x.com/napoles3D/status/1893860366540591311?t=c_k2NGDvACI8AN9JyHZPug&s=19") Sports is a turn-based simulation game where two teams—each controlled by a selected language model (LLM)—compete in a soccer-inspired match on a grid-based field. The field features dynamic obstacles and designated goal areas, and teams are represented by customizable emojis. 
+["https://x.com/napoles3D/status/1893860366540591311?t=c_k2NGDvACI8AN9JyHZPug&s=19"](LLM) Sports is a turn-based simulation game where two teams—each controlled by a selected language model (LLM)—compete in a soccer-inspired match on a grid-based field. The field features dynamic obstacles and designated goal areas, and teams are represented by customizable emojis. 
 
 <img src="https://raw.githubusercontent.com/napoles-uach/LLMSports/refs/heads/main/demo.png" alt="Demo Image" width="600" />
 Moves are determined by the LLMs based on the current state of the field, with the aim of scoring a goal, avoiding obstacles and the opponent.
